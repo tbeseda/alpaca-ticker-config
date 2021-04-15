@@ -3,42 +3,29 @@ const os = require('os');
 const {
   promises: { readFile, writeFile },
 } = require('fs');
+const { resolve } = require('path');
 const { version } = require('./package.json');
-const { program } = require('commander');
+const { Command } = require('commander');
 const Alpaca = require('@alpacahq/alpaca-trade-api');
 const yaml = require('js-yaml');
 
 (async () => {
-  const options = program
+  const program = new Command();
+
+  program
     .description('Configure Ticker with Alpaca.markets positions')
     .version(version, '-v, --version', 'output the current version')
     .requiredOption('-k, --keyId <id>', 'Your Alpaca API Key ID')
     .requiredOption('-s, --secretKey <key>', 'Your Alpaca API Secret Key')
-    .requiredOption('-rw, --reset-watchlist', 'Replace existing watchlist with positions', false)
-    .parse()
-    .opts();
+    .option('--ticker-config <filepath>', 'Path (with filename) to Ticker config YAML', `${os.homedir()}/.ticker.yaml`)
+    .option('--reset-watchlist', 'Replace existing Ticker watchlist with positions', false);
 
-  const alpaca = new Alpaca({
-    keyId: options.keyId,
-    secretKey: options.secretKey,
-  });
+  program.parse();
 
-  const configPath = (options.config || '~/.ticker.yaml').replace('~', os.homedir());
-  const defaultConfig = {
-    'show-summary': true,
-    'show-tags': true,
-    'show-fundamentals': true,
-    'show-separator': true,
-    'show-holdings': true,
-    interval: 5,
-    currency: 'USD',
-    watchlist: [],
-    lots: [],
-  };
-  let newTickerConfig = { ...defaultConfig };
+  const options = program.opts();
+
+  const configPath = resolve(options.tickerConfig);
   let existingConfig;
-  let positions = [];
-
   try {
     const configFile = await readFile(configPath, 'utf8');
     existingConfig = yaml.load(configFile);
@@ -46,12 +33,21 @@ const yaml = require('js-yaml');
     console.log('Existing Ticker config not found.');
   }
 
+  const alpaca = new Alpaca({
+    keyId: options.keyId,
+    secretKey: options.secretKey,
+  });
+  let positions = [];
   try {
     positions = await alpaca.getPositions();
   } catch (error) {
     console.log('Unable to fetch Alpaca positions.');
   }
 
+  let newTickerConfig = {
+    watchlist: [],
+    lots: [],
+  };
   if (existingConfig) {
     delete existingConfig.lots;
     if (options.resetWatchlist) delete existingConfig.watchlist;
@@ -77,8 +73,8 @@ const yaml = require('js-yaml');
 
   try {
     await writeFile(configPath, yaml.dump(newTickerConfig));
-    console.log(`New config file saved with ${newTickerConfig.lots.length} positions.`);
+    console.log(`New Ticker config file saved with ${newTickerConfig.lots.length} positions.`);
   } catch (error) {
-    console.log('Unable to write new config file.');
+    console.log('Unable to write new Ticker config file.');
   }
 })();
