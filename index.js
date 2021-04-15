@@ -3,13 +3,15 @@ const os = require('os');
 const {
   promises: { readFile, writeFile },
 } = require('fs');
+const { version } = require('./package.json');
 const { program } = require('commander');
 const Alpaca = require('@alpacahq/alpaca-trade-api');
 const yaml = require('js-yaml');
 
 (async () => {
   const options = program
-    .description('Configure ticker with Alpaca.markets positions')
+    .description('Configure Ticker with Alpaca.markets positions')
+    .version(version, '-v, --version', 'output the current version')
     .requiredOption('-k, --keyId <id>', 'Your Alpaca API Key ID')
     .requiredOption('-s, --secretKey <key>', 'Your Alpaca API Secret Key')
     .requiredOption('-rw, --reset-watchlist', 'Replace existing watchlist with positions', false)
