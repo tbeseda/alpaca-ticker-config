@@ -1,6 +1,6 @@
 {
   "name": "alpaca-ticker-config",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Configure ticker with Alpaca.markets positions",
   "main": "index.js",
   "bin": {

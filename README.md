@@ -46,6 +46,6 @@ It has only been tested on MacOS.
 
 ## Todo
 
-[ ] add option to print instead of save new config
-[ ] allow Ticker options to be passed to the config
-[ ] feature to save Alpaca credentials for subsequent runs
+- [X] add option to print instead of save new config
+- [X] allow Ticker ~~options~~ config file path to be passed to the config
+- [ ] feature to save Alpaca credentials for subsequent runs

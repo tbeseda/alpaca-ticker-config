@@ -18,7 +18,8 @@ const yaml = require('js-yaml');
     .requiredOption('-k, --keyId <id>', 'Your Alpaca API Key ID')
     .requiredOption('-s, --secretKey <key>', 'Your Alpaca API Secret Key')
     .option('--ticker-config <filepath>', 'Path (with filename) to Ticker config YAML', `${os.homedir()}/.ticker.yaml`)
-    .option('--reset-watchlist', 'Replace existing Ticker watchlist with positions', false);
+    .option('--reset-watchlist', 'Replace existing Ticker watchlist with positions', false)
+    .option('--just-print', "Don't save config to file, print YAML to terminal instead.", false);
 
   program.parse();
 
@@ -71,10 +72,16 @@ const yaml = require('js-yaml');
 
   newTickerConfig.watchlist = [...new Set(newTickerConfig.watchlist)];
 
-  try {
-    await writeFile(configPath, yaml.dump(newTickerConfig));
-    console.log(`New Ticker config file saved with ${newTickerConfig.lots.length} positions.`);
-  } catch (error) {
-    console.log('Unable to write new Ticker config file.');
+  const newTickerYaml = yaml.dump(newTickerConfig);
+
+  if (options.justPrint) {
+    console.log(newTickerYaml);
+  } else {
+    try {
+      await writeFile(configPath, newTickerYaml);
+      console.log(`New Ticker config file saved with ${newTickerConfig.lots.length} positions.`);
+    } catch (error) {
+      console.log('Unable to write new Ticker config file.');
+    }
   }
 })();
