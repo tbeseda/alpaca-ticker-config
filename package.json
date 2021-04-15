@@ -1,0 +1,23 @@
+{
+  "name": "alpaca-ticker-config",
+  "version": "0.1.0",
+  "description": "Configure ticker with Alpaca.markets positions",
+  "main": "index.js",
+  "bin": {
+    "alpaca-ticker-config": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tbeseda",
+  "keywords": [
+    "alpaca",
+    "ticker"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^2.0.0",
+    "commander": "^7.2.0",
+    "js-yaml": "^4.1.0"
+  }
+}
