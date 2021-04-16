@@ -8,6 +8,7 @@ const { version } = require('./package.json');
 const { Command } = require('commander');
 const Alpaca = require('@alpacahq/alpaca-trade-api');
 const yaml = require('js-yaml');
+const createYahooPortfolio = require('./yahoo-finance');
 
 (async () => {
   const program = new Command();
@@ -19,7 +20,8 @@ const yaml = require('js-yaml');
     .requiredOption('-s, --secretKey <key>', 'Your Alpaca API Secret Key')
     .option('--ticker-config <filepath>', 'Path (with filename) to Ticker config YAML', `${os.homedir()}/.ticker.yaml`)
     .option('--reset-watchlist', 'Replace existing Ticker watchlist with positions', false)
-    .option('--just-print', "Don't save config to file, print YAML to terminal instead.", false);
+    .option('--just-print', "Don't save config to file, print YAML to terminal instead.", false)
+    .option('--yahoo', "Don't save config to file, print CSV for Yahoo! finance.", false);
 
   program.parse();
 
@@ -43,6 +45,12 @@ const yaml = require('js-yaml');
     positions = await alpaca.getPositions();
   } catch (error) {
     console.log('Unable to fetch Alpaca positions.');
+  }
+
+  if (options.yahoo) {
+    console.log('Yahoo! CSV: \n');
+    console.log(createYahooPortfolio(positions));
+    return;
   }
 
   let newTickerConfig = {
